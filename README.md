@@ -1,73 +1,75 @@
-![](./resources/official_armmbed_example_badge.png)
-# Blinky Mbed OS example
+# DoorAccessControl
 
-The example project is part of the [Arm Mbed OS Official Examples](https://os.mbed.com/code/) and is the [getting started example for Mbed OS](https://os.mbed.com/docs/mbed-os/latest/quick-start/index.html). It contains an application that repeatedly blinks an LED on supported [Mbed boards](https://os.mbed.com/platforms/).
+A password-based door access control system built on the NXP KL46Z microcontroller.
 
-You can build the project with all supported [Mbed OS build tools](https://os.mbed.com/docs/mbed-os/latest/tools/index.html). However, this example project specifically refers to the command-line interface tools, [Arm Mbed CLI 1](https://github.com/ARMmbed/mbed-cli#installing-mbed-cli) and [Mbed CLI 2](https://github.com/ARMmbed/mbed-tools#installation).
+## Overview
 
-(Note: To see a rendered example you can import into the Arm Online Compiler, please see our [import quick start](https://os.mbed.com/docs/mbed-os/latest/quick-start/online-with-the-online-compiler.html#importing-the-code).)
+This project implements a simple but functional access control system using a 4x3 keypad, an SLCD screen, and red/green status LEDs. The door strike (electromagnetic lock) should be connected externally and controlled via an output pin (code provided, relay wiring required).
 
-## Mbed OS build tools
+- Users can enter passwords to unlock the door.
+- Admin mode allows adding, editing, and deleting user passwords.
+- Passwords are stored in internal flash memory.
+- Red/green LEDs indicate door lock status.
 
-### Mbed CLI 2
-Starting with version 6.5, Mbed OS uses Mbed CLI 2. It uses Ninja as a build system, and CMake to generate the build environment and manage the build process in a compiler-independent manner. If you are working with Mbed OS version prior to 6.5 then check the section [Mbed CLI 1](#mbed-cli-1).
-1. [Install Mbed CLI 2](https://os.mbed.com/docs/mbed-os/latest/build-tools/install-or-upgrade.html).
-1. From the command-line, import the example: `mbed-tools import mbed-os-example-blinky`
-1. Change the current directory to where the project was imported.
+## Features
 
-### Mbed CLI 1
-1. [Install Mbed CLI 1](https://os.mbed.com/docs/mbed-os/latest/quick-start/offline-with-mbed-cli.html).
-1. From the command-line, import the example: `mbed import mbed-os-example-blinky`
-1. Change the current directory to where the project was imported.
+- Admin authentication for access to user management
+- Password verification for both users and admin
+- Edit or delete existing user passwords
+- LED feedback for access success or failure
+- Simple UI through LCD scrolling text
+- Flash-based password persistence
 
-## Application functionality
+## Hardware Requirements
 
-The `main()` function is the single thread in the application. It toggles the state of a digital output connected to an LED on the board.
+- NXP KL46Z Development Board
+- 4x3 Keypad
+- SLCD display (onboard)
+- Red and Green LEDs (onboard or external)
+- External relay or circuit to control door strike (not included in code)
 
-**Note**: This example requires a target with RTOS support, i.e. one with `rtos` declared in `supported_application_profiles` in `targets/targets.json` in [mbed-os](https://github.com/ARMmbed/mbed-os). For non-RTOS targets (usually with small memory sizes), please use [mbed-os-example-blinky-baremetal](https://github.com/ARMmbed/mbed-os-example-blinky-baremetal) instead.
+## LED Behavior
 
-## Building and running
+| 🔴 Red LED   | Door locked (default state) |
+| 🟢 Green LED | Door unlocked               |
 
-1. Connect a USB cable between the USB port on the board and the host computer.
-1. Run the following command to build the example project and program the microcontroller flash memory:
+## Workflow
 
-    * Mbed CLI 2
+See the flowchart below:
 
-    ```bash
-    $ mbed-tools compile -m <TARGET> -t <TOOLCHAIN> --flash
-    ```
+![Workflow](<docs/FLOW.png>)
 
-    * Mbed CLI 1
+### Class Diagram
 
-    ```bash
-    $ mbed compile -m <TARGET> -t <TOOLCHAIN> --flash
-    ```
+![Class Diagram](<docs/CD.png>)
 
-Your PC may take a few minutes to compile your code.
+### Key Classes
 
-The binary is located at:
-* **Mbed CLI 2** - `./cmake_build/<TARGET>/develop/<TOOLCHAIN>/mbed-os-example-blinky.bin`
-* **Mbed CLI 1** - `./BUILD/<TARGET>/<TOOLCHAIN>/mbed-os-example-blinky.bin`
+| Class        | Responsibility                                             |
+|--------------|------------------------------------------------------------|
+| `Keypad`     | Handle keypad scanning and key retrieval                   |
+| `LCDManager` | Control LCD display text and scrolling messages            |
+| `UserManager`| Store, verify, edit and delete passwords from flash memory |
+| `DoorAccess` | Coordinates full access control logic                      |
 
-Alternatively, you can manually copy the binary to the board, which you mount on the host computer over USB.
+## Getting Started
 
-## Expected output
-The LED on your target turns on and off every 500 milliseconds.
+1. Clone the repository
+2. Open in [Mbed Studio](https://os.mbed.com/studio/) or compatible IDE
+3. Connect hardware as per requirements
+4. Compile and flash to KL46Z
 
+## File Overview
 
-## Troubleshooting
-If you have problems, you can review the [documentation](https://os.mbed.com/docs/latest/tutorials/debugging.html) for suggestions on what could be wrong and how to fix it.
+- `main.cpp` — Entry point
+- `DoorAccess.*` — Core logic of the access control system
+- `Keypad.*` — Keypad input reading
+- `LCDManager.*` — Text display and scrolling
+- `UserManager.*` — Password management and flash operations
 
-## Related Links
+## Notes
 
-* [Mbed OS Stats API](https://os.mbed.com/docs/latest/apis/mbed-statistics.html).
-* [Mbed OS Configuration](https://os.mbed.com/docs/latest/reference/configuration.html).
-* [Mbed OS Serial Communication](https://os.mbed.com/docs/latest/tutorials/serial-communication.html).
-* [Mbed OS bare metal](https://os.mbed.com/docs/mbed-os/latest/reference/mbed-os-bare-metal.html).
-* [Mbed boards](https://os.mbed.com/platforms/).
-
-### License and contributions
-
-The software is provided under Apache-2.0 license. Contributions to this project are accepted under the same license. Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more info.
-
-This project contains code from other projects. The original license text is included in those source files. They must comply with our license guide.
+- Default admin password is set in `UserManager.cpp`.
+- Flash memory handling does not include wear leveling.
+- You must implement the final relay circuit externally for door strike control.
+---

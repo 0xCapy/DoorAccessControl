@@ -39,10 +39,6 @@ See the flowchart below:
 
 ![Workflow](<docs/FLOW.png>)
 
-### Class Diagram
-
-![Class Diagram](<docs/CD.png>)
-
 ### Key Classes
 
 | Class        | Responsibility                                             |
